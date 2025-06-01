@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import PdfViewer from "@/components/common/PdfViewer";
 
 export default function MoMDetailPage() {
     const params = useParams();
@@ -176,13 +177,7 @@ export default function MoMDetailPage() {
             title="Documento PDF"
             description="Visualização do documento original submetido"
         >
-            {/* Aqui seria integrado um visualizador de PDF */}
-            <div className="w-full h-96 bg-muted rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                    <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Visualizador de PDF</p>
-                </div>
-            </div>
+            <PdfViewer fileUrl={mom.pdfUrl} height="600px" />
         </PageCard>
     );
 
