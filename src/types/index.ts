@@ -12,6 +12,11 @@ export interface MeetingMinute {
     comments?: string[];
     blockchainHash?: string;
     blockchainTxId?: string;
+    createdBy?: {
+        login: string;
+        cnpj?: string;
+    };
+    commentsCount?: number;
 }
 
 export interface LLMData {
@@ -40,19 +45,29 @@ export interface ValidationReport {
 export interface User {
     id: string;
     login: string;
-    accessLevel: "client" | "notary" | "admin";
-    name: string;
-    email: string;
+    cnpj?: string;
+    accessLevel: "client" | "notary";
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface AuthResponse {
     token: string;
-    accessLevel: "client" | "notary" | "admin";
+    accessLevel: "client" | "notary";
+    user: {
+        id: string;
+        login: string;
+        cnpj?: string;
+        accessLevel: "client" | "notary";
+    };
 }
 
 export interface MeetingMinutesResponse {
     meetingMinutes: MeetingMinute[];
     total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
 
 export interface MeetingMinuteFilters {
@@ -77,4 +92,9 @@ export const statusColors = {
     under_review: "bg-blue-100 text-blue-800 hover:bg-blue-200",
     authenticated: "bg-green-100 text-green-800 hover:bg-green-200",
     rejected: "bg-red-100 text-red-800 hover:bg-red-200",
+} as const;
+
+export const accessLevelLabels = {
+    client: "Cliente",
+    notary: "Cartorário",
 } as const;
