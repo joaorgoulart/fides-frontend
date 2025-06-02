@@ -124,18 +124,27 @@ export default function MoMDetailPage() {
         setEditValue("");
     };
 
-    const handleAddComment = () => {
+    const handleAddComment = async () => {
         if (!mom || !newComment.trim()) return;
 
-        setMom((prev) =>
-            prev
-                ? {
-                      ...prev,
-                      comments: [...(prev.comments || []), newComment.trim()],
-                  }
-                : null
-        );
-        setNewComment("");
+        try {
+            setLoading(true);
+            const response = await apiService.addComment(mom.id, newComment.trim());
+            setMom((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          comments: response.comments,
+                          commentsCount: response.commentsCount,
+                      }
+                    : null
+            );
+            setNewComment("");
+        } catch (error) {
+            console.error("Erro ao adicionar comentário:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const getStatusBadge = (status: MeetingMinute["status"]) => {

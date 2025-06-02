@@ -5,6 +5,7 @@ import {
     MeetingMinuteFilters,
     statusLabels,
     statusColors,
+    accessLevelLabels,
 } from "@/types";
 import {
     Select,
@@ -56,6 +57,7 @@ export default function DashboardPage() {
         limit: 10,
     });
     const [totalMeetingMinutes, setTotalMeetingMinutes] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
     const router = useRouter();
     const { user, logout, isAuthenticated } = useAuth();
@@ -112,6 +114,7 @@ export default function DashboardPage() {
             const response = await apiService.getMeetingMinutes(filters);
             setMeetingMinutes(response.meetingMinutes);
             setTotalMeetingMinutes(response.total);
+            setTotalPages(response.totalPages);
         } catch (error) {
             console.error("Erro ao carregar Atas de Reunião:", error);
         } finally {
@@ -154,20 +157,18 @@ export default function DashboardPage() {
         );
     };
 
-    const totalPages = Math.ceil(totalMeetingMinutes / (filters.limit || 10));
-
     // Ações do header
     const headerActions = (
         <>
             <span className="text-sm text-muted-foreground mr-2">
-                {user?.name} ({user?.accessLevel})
+                {user?.login} ({accessLevelLabels[user?.accessLevel || "client"]})
+                {user?.cnpj && ` - ${applyCnpjMask(user.cnpj)}`}
             </span>
-            <Button variant="ghost" size="sm">
-                <Settings className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="sm">
-                <User className="h-5 w-5" />
-            </Button>
+            <Link href="/perfil">
+                <Button variant="ghost" size="sm">
+                    <User className="h-5 w-5" />
+                </Button>
+            </Link>
             <Button variant="ghost" size="sm" onClick={logout}>
                 <LogOut className="h-5 w-5" />
             </Button>
