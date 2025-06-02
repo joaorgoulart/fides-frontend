@@ -74,6 +74,27 @@ class ApiService {
         return {
             token: response.token,
             accessLevel: response.accessLevel,
+            user: response.user,
+        };
+    }
+
+    async register(cnpj: string, password: string): Promise<{
+        user: {
+            id: string;
+            login: string;
+            cnpj: string;
+            accessLevel: string;
+        };
+        message: string;
+    }> {
+        const response = await this.request<any>("/register", {
+            method: "POST",
+            body: JSON.stringify({ cnpj, password }),
+        });
+
+        return {
+            user: response.user,
+            message: response.message || "Cadastro realizado com sucesso",
         };
     }
 
@@ -105,6 +126,9 @@ class ApiService {
         return {
             meetingMinutes: response.meetingMinutes,
             total: response.total,
+            page: response.page,
+            limit: response.limit,
+            totalPages: response.totalPages,
         };
     }
 
@@ -144,32 +168,49 @@ class ApiService {
         };
     }
 
+    async addComment(
+        id: string,
+        comment: string
+    ): Promise<{ comments: string[]; commentsCount: number }> {
+        return this.request<{ comments: string[]; commentsCount: number }>(
+            `/meeting-minutes/${id}/comments`,
+            {
+                method: "POST",
+                body: JSON.stringify({ comment }),
+            }
+        );
+    }
+
     // User management
     async getCurrentUser(): Promise<User> {
         const response = await this.request<any>("/user");
 
-        // Adaptar resposta para o formato esperado pelo frontend
+        // Adaptar resposta para o formato esperado pelo frontend (sem name/email)
         return {
             id: response.id,
             login: response.login,
-            name: response.name,
-            email: response.email,
+            cnpj: response.cnpj,
             accessLevel: response.accessLevel,
+            createdAt: response.createdAt,
+            updatedAt: response.updatedAt,
+            stats: response.stats,
         };
     }
 
-    async updateProfile(
-        updates: Partial<User>
-    ): Promise<{ success: boolean; message: string }> {
-        const response = await this.request<any>("/user/profile", {
-            method: "PUT",
-            body: JSON.stringify(updates),
-        });
-
-        return {
-            success: true,
-            message: response.message || "Perfil atualizado com sucesso",
-        };
+    async getMeetingMinutesByClient(cnpj: string): Promise<{
+        moms: Array<{
+            id: string;
+            submissionDate: string;
+            status: string;
+            summary: string;
+            pdfUrl?: string;
+        }>;
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }> {
+        return this.request<any>(`/meeting-minutes/client/${cnpj}`);
     }
 
     // File upload utility
@@ -182,6 +223,28 @@ class ApiService {
             headers: {
                 ...this.getAuthHeader(),
                 // Don't set Content-Type for FormData, let browser set it
+            },
+            body: formData,
+        });
+    }
+
+    async createMeetingMinute(cnpj: string, pdfFile: File): Promise<{
+        id: string;
+        cnpj: string;
+        submissionDate: string;
+        status: string;
+        summary: string;
+        pdfUrl?: string;
+        success: boolean;
+    }> {
+        const formData = new FormData();
+        formData.append("cnpj", cnpj);
+        formData.append("pdf", pdfFile);
+
+        return this.request("/meeting-minutes", {
+            method: "POST",
+            headers: {
+                ...this.getAuthHeader(),
             },
             body: formData,
         });
