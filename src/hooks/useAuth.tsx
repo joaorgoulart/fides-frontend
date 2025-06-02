@@ -56,6 +56,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setIsLoading(true);
             const authResponse = await apiService.login(username, password);
 
+            // Salvar token também em cookie para o middleware
+            if (typeof document !== 'undefined') {
+                document.cookie = `auth_token=${authResponse.token}; path=/; max-age=${24 * 60 * 60}; SameSite=Strict`;
+            }
+
             // Buscar dados completos do usuário
             const userData = await apiService.getCurrentUser();
             setUser(userData);
@@ -69,6 +74,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = () => {
         apiService.logout();
+        
+        // Remover cookie também
+        if (typeof document !== 'undefined') {
+            document.cookie = 'auth_token=; path=/; max-age=0; SameSite=Strict';
+        }
+        
         setUser(null);
         // Redirecionar para login
         window.location.href = "/login";

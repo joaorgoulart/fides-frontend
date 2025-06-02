@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function LoginPage() {
     const [credentials, setCredentials] = useState({
@@ -41,7 +42,8 @@ export default function LoginPage() {
 
         try {
             await login(credentials.login, credentials.password);
-            router.push("/dashboard");
+            // O redirecionamento será feito pelo middleware baseado no accessLevel
+            // Não precisamos mais fazer manualmente aqui
         } catch (err: any) {
             setError(err.message || "Credenciais inválidas. Tente novamente.");
         }
@@ -61,10 +63,10 @@ export default function LoginPage() {
                             />
                         </div>
                         <CardTitle className="text-2xl font-bold">
-                            Interface do Cartorário
+                            Sistema Fides
                         </CardTitle>
                         <CardDescription>
-                            Sistema Fides - Acesse sua conta
+                            Acesse sua conta para continuar
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -159,8 +161,17 @@ export default function LoginPage() {
 
                         {/* Footer */}
                         <div className="mt-8 text-center">
+                            <div className="text-sm text-gray-600 mb-2">
+                                Empresa ainda não cadastrada?{" "}
+                                <Link
+                                    href="/cadastro"
+                                    className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
+                                >
+                                    Criar conta
+                                </Link>
+                            </div>
                             <p className="text-xs text-muted-foreground">
-                                Sistema Fides v1.0 - Interface do Cartorário
+                                Sistema Fides v1.0
                             </p>
                         </div>
                     </CardContent>
