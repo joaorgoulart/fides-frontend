@@ -75,15 +75,15 @@ export default function AtaDetalhePage() {
     const getStatusIcon = (status: string) => {
         switch (status.toLowerCase()) {
             case 'pending':
-                return <Clock className="h-5 w-5 text-yellow-500" />;
+                return <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />;
             case 'under_review':
-                return <Eye className="h-5 w-5 text-blue-500" />;
+                return <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />;
             case 'authenticated':
-                return <CheckCircle className="h-5 w-5 text-green-500" />;
+                return <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />;
             case 'rejected':
-                return <XCircle className="h-5 w-5 text-red-500" />;
+                return <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />;
             default:
-                return <Clock className="h-5 w-5 text-gray-500" />;
+                return <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />;
         }
     };
 
@@ -131,89 +131,97 @@ export default function AtaDetalhePage() {
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
             {/* Header */}
             <div className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center">
+                <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+                    <div className="flex justify-between items-center h-14 sm:h-16">
+                        <div className="flex items-center min-w-0 flex-1">
                             <Image
                                 src="/logo.png"
                                 alt="Logo"
-                                width={120}
-                                height={40}
+                                width={100}
+                                height={32}
+                                className="sm:w-[120px] sm:h-[40px] flex-shrink-0"
                             />
-                            <div className="ml-4">
-                                <h1 className="text-xl font-semibold text-green-700">
+                            <div className="ml-2 sm:ml-4 min-w-0 flex-1">
+                                <h1 className="text-base sm:text-xl font-semibold text-green-700 truncate">
                                     Interface Empresarial
                                 </h1>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-xs sm:text-sm text-gray-600 truncate">
                                     CNPJ: {user?.cnpj}
                                 </p>
                             </div>
                         </div>
-                        <Button variant="outline" onClick={logout}>
-                            Sair
+                        <Button variant="outline" onClick={logout} size="sm" className="flex-shrink-0 ml-2">
+                            <span className="hidden sm:inline">Sair</span>
+                            <span className="sm:hidden">Sair</span>
                         </Button>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
                 {/* Back Button */}
-                <div className="mb-6">
+                <div className="mb-4 sm:mb-6">
                     <Button
                         variant="ghost"
                         onClick={() => router.push('/empresa')}
-                        className="text-green-600 hover:text-green-700"
+                        className="text-green-600 hover:text-green-700 p-2 sm:px-4"
+                        size="sm"
                     >
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Voltar para lista de atas
+                        <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
+                        <span className="text-sm sm:text-base">Voltar para lista de atas</span>
                     </Button>
                 </div>
 
                 {/* Error Alert */}
                 {error && (
-                    <Alert variant="destructive" className="mb-6">
-                        <AlertDescription>{error}</AlertDescription>
+                    <Alert variant="destructive" className="mb-4 sm:mb-6">
+                        <AlertDescription className="text-sm">{error}</AlertDescription>
                     </Alert>
                 )}
 
                 {/* Loading */}
                 {isLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                        <span className="ml-2 text-gray-600">Carregando detalhes da ata...</span>
+                    <div className="flex items-center justify-center py-8 sm:py-12">
+                        <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-green-600"></div>
+                        <span className="ml-2 text-sm sm:text-base text-gray-600">Carregando detalhes da ata...</span>
                     </div>
                 ) : meetingMinute ? (
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                         {/* Header da Ata */}
                         <Card className="bg-white">
-                            <CardHeader>
-                                <div className="flex items-start justify-between">
-                                    <div>
-                                        <CardTitle className="text-2xl text-gray-900 mb-2">
+                            <CardHeader className="p-4 sm:p-6">
+                                <div className="space-y-4 sm:space-y-0 sm:flex sm:items-start sm:justify-between">
+                                    <div className="min-w-0 flex-1">
+                                        <CardTitle className="text-xl sm:text-2xl text-gray-900 mb-2 sm:mb-3">
                                             Ata de Reunião
                                         </CardTitle>
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(meetingMinute.status)}`}>
+                                        <div className="space-y-2 sm:space-y-3 mb-3">
+                                            <span className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs sm:text-sm font-medium border ${getStatusColor(meetingMinute.status)} w-fit`}>
                                                 {getStatusIcon(meetingMinute.status)}
                                                 {getStatusText(meetingMinute.status)}
                                             </span>
-                                            <span className="text-sm text-gray-500">
-                                                ID: {meetingMinute.id}
-                                            </span>
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                                                <span className="text-xs sm:text-sm text-gray-500 break-all">
+                                                    ID: {meetingMinute.id}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <p className="text-sm text-gray-600">
+                                        <p className="text-xs sm:text-sm text-gray-600">
                                             Submetida em: {formatDate(meetingMinute.submissionDate)}
                                         </p>
                                     </div>
                                     {meetingMinute.pdfUrl && (
-                                        <Button
-                                            onClick={() => window.open(meetingMinute.pdfUrl, '_blank')}
-                                            className="bg-green-600 hover:bg-green-700"
-                                        >
-                                            <FileText className="h-4 w-4 mr-2" />
-                                            Ver PDF Completo
-                                        </Button>
+                                        <div className="w-full sm:w-auto sm:ml-4">
+                                            <Button
+                                                onClick={() => window.open(meetingMinute.pdfUrl, '_blank')}
+                                                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+                                                size="sm"
+                                            >
+                                                <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                                                <span className="text-sm">Ver PDF Completo</span>
+                                            </Button>
+                                        </div>
                                     )}
                                 </div>
                             </CardHeader>
@@ -222,11 +230,11 @@ export default function AtaDetalhePage() {
                         {/* Resumo */}
                         {meetingMinute.llmData?.summary && (
                             <Card className="bg-white">
-                                <CardHeader>
-                                    <CardTitle className="text-lg">Resumo da Reunião</CardTitle>
+                                <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-3">
+                                    <CardTitle className="text-base sm:text-lg">Resumo da Reunião</CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <p className="text-gray-700">{meetingMinute.llmData.summary}</p>
+                                <CardContent className="p-4 sm:p-6 pt-0">
+                                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{meetingMinute.llmData.summary}</p>
                                 </CardContent>
                             </Card>
                         )}
@@ -234,13 +242,13 @@ export default function AtaDetalhePage() {
                         {/* Assuntos Tratados */}
                         {meetingMinute.llmData?.subjects && meetingMinute.llmData.subjects.length > 0 && (
                             <Card className="bg-white">
-                                <CardHeader>
-                                    <CardTitle className="text-lg">Assuntos Tratados</CardTitle>
+                                <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-3">
+                                    <CardTitle className="text-base sm:text-lg">Assuntos Tratados</CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <ul className="list-disc list-inside space-y-2">
+                                <CardContent className="p-4 sm:p-6 pt-0">
+                                    <ul className="list-disc list-inside space-y-1 sm:space-y-2">
                                         {meetingMinute.llmData.subjects.map((subject, index) => (
-                                            <li key={index} className="text-gray-700">{subject}</li>
+                                            <li key={index} className="text-sm sm:text-base text-gray-700 leading-relaxed">{subject}</li>
                                         ))}
                                     </ul>
                                 </CardContent>
@@ -250,13 +258,13 @@ export default function AtaDetalhePage() {
                         {/* Deliberações */}
                         {meetingMinute.llmData?.deliberations && meetingMinute.llmData.deliberations.length > 0 && (
                             <Card className="bg-white">
-                                <CardHeader>
-                                    <CardTitle className="text-lg">Deliberações</CardTitle>
+                                <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-3">
+                                    <CardTitle className="text-base sm:text-lg">Deliberações</CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <ul className="list-disc list-inside space-y-2">
+                                <CardContent className="p-4 sm:p-6 pt-0">
+                                    <ul className="list-disc list-inside space-y-1 sm:space-y-2">
                                         {meetingMinute.llmData.deliberations.map((deliberation, index) => (
-                                            <li key={index} className="text-gray-700">{deliberation}</li>
+                                            <li key={index} className="text-sm sm:text-base text-gray-700 leading-relaxed">{deliberation}</li>
                                         ))}
                                     </ul>
                                 </CardContent>
@@ -266,17 +274,27 @@ export default function AtaDetalhePage() {
                         {/* Participantes */}
                         {meetingMinute.llmData?.participants && meetingMinute.llmData.participants.length > 0 && (
                             <Card className="bg-white">
-                                <CardHeader>
-                                    <CardTitle className="text-lg">Participantes</CardTitle>
+                                <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-3">
+                                    <CardTitle className="text-base sm:text-lg">Participantes</CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-3">
+                                <CardContent className="p-4 sm:p-6 pt-0">
+                                    <div className="space-y-2 sm:space-y-3">
                                         {meetingMinute.llmData.participants.map((participant, index) => (
-                                            <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                                                <p className="font-medium text-gray-900">{participant.name}</p>
-                                                <p className="text-sm text-gray-600">
-                                                    {participant.role} - RG: {participant.rg} - CPF: {participant.cpf}
-                                                </p>
+                                            <div key={index} className="p-3 sm:p-4 bg-gray-50 rounded-lg">
+                                                <p className="font-medium text-gray-900 text-sm sm:text-base mb-1">{participant.name}</p>
+                                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                                    <p className="text-xs sm:text-sm text-gray-600">
+                                                        {participant.role}
+                                                    </p>
+                                                    <span className="hidden sm:inline text-gray-400">•</span>
+                                                    <p className="text-xs sm:text-sm text-gray-600">
+                                                        RG: {participant.rg}
+                                                    </p>
+                                                    <span className="hidden sm:inline text-gray-400">•</span>
+                                                    <p className="text-xs sm:text-sm text-gray-600">
+                                                        CPF: {participant.cpf}
+                                                    </p>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -287,14 +305,14 @@ export default function AtaDetalhePage() {
                         {/* Comentários */}
                         {meetingMinute.comments && meetingMinute.comments.length > 0 && (
                             <Card className="bg-white">
-                                <CardHeader>
-                                    <CardTitle className="text-lg">Comentários do Cartório</CardTitle>
+                                <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-3">
+                                    <CardTitle className="text-base sm:text-lg">Comentários do Cartório</CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-3">
+                                <CardContent className="p-4 sm:p-6 pt-0">
+                                    <div className="space-y-2 sm:space-y-3">
                                         {meetingMinute.comments.map((comment, index) => (
-                                            <div key={index} className="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                                                <p className="text-gray-700">{comment}</p>
+                                            <div key={index} className="p-3 sm:p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                                                <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{comment}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -304,15 +322,15 @@ export default function AtaDetalhePage() {
                     </div>
                 ) : (
                     <Card className="bg-white">
-                        <CardContent className="p-12 text-center">
-                            <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        <CardContent className="p-8 sm:p-12 text-center">
+                            <Building2 className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                            <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-1 sm:mb-2">
                                 Ata não encontrada
                             </h3>
-                            <p className="text-gray-600 mb-6">
+                            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
                                 A ata solicitada não foi encontrada ou você não tem permissão para visualizá-la.
                             </p>
-                            <Button onClick={() => router.push('/empresa')}>
+                            <Button onClick={() => router.push('/empresa')} size="sm">
                                 Voltar para lista de atas
                             </Button>
                         </CardContent>

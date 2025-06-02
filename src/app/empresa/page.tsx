@@ -109,66 +109,68 @@ export default function EmpresaPage() {
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
             {/* Header */}
             <div className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center">
+                <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+                    <div className="flex justify-between items-center h-14 sm:h-16">
+                        <div className="flex items-center min-w-0 flex-1">
                             <Image
                                 src="/logo.png"
                                 alt="Logo"
-                                width={120}
-                                height={40}
+                                width={100}
+                                height={32}
+                                className="sm:w-[120px] sm:h-[40px] flex-shrink-0"
                             />
-                            <div className="ml-4">
-                                <h1 className="text-xl font-semibold text-green-700">
+                            <div className="ml-2 sm:ml-4 min-w-0 flex-1">
+                                <h1 className="text-base sm:text-xl font-semibold text-green-700 truncate">
                                     Interface Empresarial
                                 </h1>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-xs sm:text-sm text-gray-600 truncate">
                                     CNPJ: {user?.cnpj}
                                 </p>
                             </div>
                         </div>
-                        <Button variant="outline" onClick={logout}>
-                            Sair
+                        <Button variant="outline" onClick={logout} size="sm" className="flex-shrink-0 ml-2">
+                            <span className="hidden sm:inline">Sair</span>
+                            <span className="sm:hidden">Sair</span>
                         </Button>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
+                <div className="mb-6 sm:mb-8">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">
                         Minhas Atas de Reunião
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-sm sm:text-base text-gray-600">
                         Acompanhe o status de todas as atas submetidas para autenticação
                     </p>
                 </div>
 
                 {/* Error Alert */}
                 {error && (
-                    <Alert variant="destructive" className="mb-6">
-                        <AlertDescription>{error}</AlertDescription>
+                    <Alert variant="destructive" className="mb-4 sm:mb-6">
+                        <AlertDescription className="text-sm">{error}</AlertDescription>
                     </Alert>
                 )}
 
                 {/* Loading */}
                 {isLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                        <span className="ml-2 text-gray-600">Carregando atas...</span>
+                    <div className="flex items-center justify-center py-8 sm:py-12">
+                        <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-green-600"></div>
+                        <span className="ml-2 text-sm sm:text-base text-gray-600">Carregando atas...</span>
                     </div>
                 ) : (
                     <>
                         {/* Statistics Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
                             <Card className="bg-white">
-                                <CardContent className="p-6">
+                                <CardContent className="p-3 sm:p-6">
                                     <div className="flex items-center">
-                                        <FileText className="h-8 w-8 text-green-600" />
-                                        <div className="ml-4">
-                                            <p className="text-sm font-medium text-gray-600">Total de Atas</p>
-                                            <p className="text-2xl font-bold text-gray-900">
+                                        <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+                                        <div className="ml-2 sm:ml-4 min-w-0">
+                                            <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Total de Atas</p>
+                                            <p className="text-lg sm:text-2xl font-bold text-gray-900">
                                                 {meetingMinutes.length}
                                             </p>
                                         </div>
@@ -177,12 +179,12 @@ export default function EmpresaPage() {
                             </Card>
 
                             <Card className="bg-white">
-                                <CardContent className="p-6">
+                                <CardContent className="p-3 sm:p-6">
                                     <div className="flex items-center">
-                                        <Clock className="h-8 w-8 text-yellow-600" />
-                                        <div className="ml-4">
-                                            <p className="text-sm font-medium text-gray-600">Pendentes</p>
-                                            <p className="text-2xl font-bold text-gray-900">
+                                        <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-600 flex-shrink-0" />
+                                        <div className="ml-2 sm:ml-4 min-w-0">
+                                            <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Pendentes</p>
+                                            <p className="text-lg sm:text-2xl font-bold text-gray-900">
                                                 {meetingMinutes.filter(m => m.status.toLowerCase() === 'pending').length}
                                             </p>
                                         </div>
@@ -191,12 +193,12 @@ export default function EmpresaPage() {
                             </Card>
 
                             <Card className="bg-white">
-                                <CardContent className="p-6">
+                                <CardContent className="p-3 sm:p-6">
                                     <div className="flex items-center">
-                                        <Eye className="h-8 w-8 text-blue-600" />
-                                        <div className="ml-4">
-                                            <p className="text-sm font-medium text-gray-600">Em Análise</p>
-                                            <p className="text-2xl font-bold text-gray-900">
+                                        <Eye className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+                                        <div className="ml-2 sm:ml-4 min-w-0">
+                                            <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Em Análise</p>
+                                            <p className="text-lg sm:text-2xl font-bold text-gray-900">
                                                 {meetingMinutes.filter(m => m.status.toLowerCase() === 'under_review').length}
                                             </p>
                                         </div>
@@ -205,12 +207,12 @@ export default function EmpresaPage() {
                             </Card>
 
                             <Card className="bg-white">
-                                <CardContent className="p-6">
+                                <CardContent className="p-3 sm:p-6">
                                     <div className="flex items-center">
-                                        <CheckCircle className="h-8 w-8 text-green-600" />
-                                        <div className="ml-4">
-                                            <p className="text-sm font-medium text-gray-600">Autenticadas</p>
-                                            <p className="text-2xl font-bold text-gray-900">
+                                        <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+                                        <div className="ml-2 sm:ml-4 min-w-0">
+                                            <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Autenticadas</p>
+                                            <p className="text-lg sm:text-2xl font-bold text-gray-900">
                                                 {meetingMinutes.filter(m => m.status.toLowerCase() === 'authenticated').length}
                                             </p>
                                         </div>
@@ -222,73 +224,77 @@ export default function EmpresaPage() {
                         {/* Meeting Minutes List */}
                         {meetingMinutes.length === 0 ? (
                             <Card className="bg-white">
-                                <CardContent className="p-12 text-center">
-                                    <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                <CardContent className="p-8 sm:p-12 text-center">
+                                    <Building2 className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                                    <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-1 sm:mb-2">
                                         Nenhuma ata encontrada
                                     </h3>
-                                    <p className="text-gray-600 mb-6">
+                                    <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
                                         Você ainda não possui atas submetidas para autenticação.
                                     </p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-xs sm:text-sm text-gray-500">
                                         As atas são submetidas através do terminal no cartório.
                                     </p>
                                 </CardContent>
                             </Card>
                         ) : (
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                                 {meetingMinutes.map((minute) => (
                                     <Card key={minute.id} className="bg-white hover:shadow-md transition-shadow cursor-pointer"
                                           onClick={() => window.location.href = `/empresa/ata/${minute.id}`}>
-                                        <CardContent className="p-6">
-                                            <div className="flex items-start justify-between">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-3 mb-3">
-                                                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(minute.status)}`}>
+                                        <CardContent className="p-4 sm:p-6">
+                                            <div className="space-y-3 sm:space-y-0 sm:flex sm:items-start sm:justify-between">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
+                                                        <span className={`inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(minute.status)} w-fit`}>
                                                             {getStatusIcon(minute.status)}
                                                             {getStatusText(minute.status)}
                                                         </span>
-                                                        <span className="text-sm text-gray-500">
+                                                        <span className="text-xs sm:text-sm text-gray-500 truncate">
                                                             ID: {minute.id.slice(0, 8)}...
                                                         </span>
                                                     </div>
                                                     
-                                                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                                    <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
                                                         Ata de Reunião
                                                     </h3>
                                                     
-                                                    <p className="text-gray-600 mb-3">
+                                                    <p className="text-sm sm:text-base text-gray-600 mb-3 line-clamp-2">
                                                         {minute.summary || "Resumo não disponível"}
                                                     </p>
                                                     
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-xs sm:text-sm text-gray-500">
                                                         Submetida em: {formatDate(minute.submissionDate)}
                                                     </p>
                                                 </div>
                                                 
-                                                <div className="ml-4 flex flex-col gap-2">
+                                                <div className="flex flex-row sm:flex-col gap-2 sm:ml-4">
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
+                                                        className="flex-1 sm:flex-none text-xs sm:text-sm min-h-[36px] sm:min-h-[32px]"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             window.location.href = `/empresa/ata/${minute.id}`;
                                                         }}
                                                     >
-                                                        <Eye className="h-4 w-4 mr-2" />
-                                                        Ver Detalhes
+                                                        <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                                                        <span className="hidden sm:inline">Ver Detalhes</span>
+                                                        <span className="sm:hidden">Detalhes</span>
                                                     </Button>
                                                     {minute.pdfUrl && (
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
+                                                            className="flex-1 sm:flex-none text-xs sm:text-sm min-h-[36px] sm:min-h-[32px]"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 window.open(minute.pdfUrl, '_blank');
                                                             }}
                                                         >
-                                                            <FileText className="h-4 w-4 mr-2" />
-                                                            Ver PDF
+                                                            <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                                                            <span className="hidden sm:inline">Ver PDF</span>
+                                                            <span className="sm:hidden">PDF</span>
                                                         </Button>
                                                     )}
                                                 </div>
