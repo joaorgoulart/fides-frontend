@@ -181,6 +181,44 @@ class ApiService {
         );
     }
 
+    async updateLLMData(
+        id: string,
+        llmData: {
+            summary?: string;
+            subjects?: string[];
+            agenda?: string;
+            deliberations?: string[];
+            participants?: Array<{
+                name: string;
+                rg: string;
+                cpf: string;
+                role: string;
+            }>;
+            signatures?: string[];
+            keywords?: string[];
+        }
+    ): Promise<{
+        summary: string;
+        subjects: string[];
+        agenda: string;
+        deliberations: string[];
+        participants: Array<{
+            name: string;
+            rg: string;
+            cpf: string;
+            role: string;
+        }>;
+        signatures: string[];
+        keywords: string[];
+    }> {
+        const response = await this.request<any>(`/meeting-minutes/${id}/llm-data`, {
+            method: "PUT",
+            body: JSON.stringify({ llmData }),
+        });
+
+        return response;
+    }
+
     // User management
     async getCurrentUser(): Promise<User> {
         const response = await this.request<any>("/user");
@@ -194,6 +232,17 @@ class ApiService {
             createdAt: response.createdAt,
             updatedAt: response.updatedAt,
             stats: response.stats,
+        };
+    }
+
+    async updateUser(currentPassword: string, newPassword: string): Promise<{ message: string }> {
+        const response = await this.request<any>("/user", {
+            method: "PUT",
+            body: JSON.stringify({ currentPassword, newPassword }),
+        });
+
+        return {
+            message: response.message || "Senha atualizada com sucesso",
         };
     }
 
@@ -247,6 +296,53 @@ class ApiService {
                 ...this.getAuthHeader(),
             },
             body: formData,
+        });
+    }
+
+    // Admin User Management
+    async getAllUsers(): Promise<User[]> {
+        return this.request<User[]>("/admin/users");
+    }
+
+    async createUser(userData: {
+        login: string;
+        cnpj?: string;
+        password: string;
+        accessLevel: "CLIENT" | "NOTARY";
+    }): Promise<{
+        user: User;
+        message: string;
+    }> {
+        return this.request<{
+            user: User;
+            message: string;
+        }>("/admin/users", {
+            method: "POST",
+            body: JSON.stringify(userData),
+        });
+    }
+
+    async updateUserByAdmin(userId: string, updateData: {
+        login?: string;
+        cnpj?: string;
+        password?: string;
+        accessLevel?: "CLIENT" | "NOTARY";
+    }): Promise<{
+        user: User;
+        message: string;
+    }> {
+        return this.request<{
+            user: User;
+            message: string;
+        }>(`/admin/users/${userId}`, {
+            method: "PUT",
+            body: JSON.stringify(updateData),
+        });
+    }
+
+    async deleteUser(userId: string): Promise<{ message: string }> {
+        return this.request<{ message: string }>(`/admin/users/${userId}`, {
+            method: "DELETE",
         });
     }
 }

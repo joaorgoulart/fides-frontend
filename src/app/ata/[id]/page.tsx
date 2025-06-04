@@ -1,20 +1,11 @@
 "use client";
 
 import {
-    FileText,
     CheckCircle,
     XCircle,
     AlertTriangle,
     Shield,
 } from "lucide-react";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
 import {
     PageContainer,
     PageHeader,
@@ -33,6 +24,8 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import PdfViewer from "@/components/common/PdfViewer";
+import LLMDataEditor from "@/components/common/LLMDataEditor";
+import Image from "next/image";
 
 export default function MoMDetailPage() {
     const params = useParams();
@@ -129,7 +122,10 @@ export default function MoMDetailPage() {
 
         try {
             setLoading(true);
-            const response = await apiService.addComment(mom.id, newComment.trim());
+            const response = await apiService.addComment(
+                mom.id,
+                newComment.trim()
+            );
             setMom((prev) =>
                 prev
                     ? {
@@ -145,6 +141,17 @@ export default function MoMDetailPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleLLMDataUpdate = (updatedLLMData: any) => {
+        setMom((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      llmData: updatedLLMData,
+                  }
+                : null
+        );
     };
 
     const getStatusBadge = (status: MeetingMinute["status"]) => {
@@ -367,13 +374,19 @@ export default function MoMDetailPage() {
     );
 
     return (
-        <PageContainer>
+        <PageContainer className="bg-gradient-to-b from-blue-50 to-indigo-100">
             <PageHeader
                 title={`Ata #${mom.id}`}
                 showBackButton
                 onBack={() => router.back()}
                 actions={getStatusBadge(mom.status)}
-                icon={<FileText className="h-8 w-8 text-blue-600" />}
+                icon={<Image
+                    src="/logo.png"
+                    alt="Logo"
+                    width={40}
+                    height={40}
+                    className="sm:w-[40px] sm:h-[40px] flex-shrink-0"
+                />}
             />
 
             <PageContent>
@@ -381,103 +394,14 @@ export default function MoMDetailPage() {
 
                 {/* LLM Data Section */}
                 <PageSection className="mt-8">
-                    <PageCard
-                        title="Análise IA"
-                        description="Dados extraídos automaticamente do documento pelo sistema"
-                    >
-                        <div className="space-y-6">
-                            {/* Summary */}
-                            <div>
-                                <Label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Resumo
-                                </Label>
-                                <div className="bg-gray-50 rounded-md p-4">
-                                    <p className="text-sm text-gray-700">
-                                        {mom.llmData?.summary}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Subjects */}
-                            <div>
-                                <Label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Assuntos Abordados
-                                </Label>
-                                <div className="flex flex-wrap gap-2">
-                                    {mom.llmData?.subjects.map(
-                                        (subject, index) => (
-                                            <span
-                                                key={index}
-                                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                                            >
-                                                {subject}
-                                            </span>
-                                        )
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Participants */}
-                            <div>
-                                <Label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Participantes
-                                </Label>
-                                <div className="overflow-x-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Nome</TableHead>
-                                                <TableHead>RG</TableHead>
-                                                <TableHead>CPF</TableHead>
-                                                <TableHead>Função</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {mom.llmData?.participants.map(
-                                                (participant, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell className="text-sm text-gray-900">
-                                                            {participant.name}
-                                                        </TableCell>
-                                                        <TableCell className="text-sm text-gray-500">
-                                                            {participant.rg}
-                                                        </TableCell>
-                                                        <TableCell className="text-sm text-gray-500">
-                                                            {participant.cpf}
-                                                        </TableCell>
-                                                        <TableCell className="text-sm text-gray-700">
-                                                            {participant.role}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            </div>
-
-                            {/* Deliberations */}
-                            <div>
-                                <Label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Deliberações
-                                </Label>
-                                <div className="space-y-2">
-                                    {mom.llmData?.deliberations.map(
-                                        (deliberation, index) => (
-                                            <div
-                                                key={index}
-                                                className="bg-gray-50 rounded-md p-3"
-                                            >
-                                                <p className="text-sm text-gray-700">
-                                                    {deliberation}
-                                                </p>
-                                            </div>
-                                        )
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </PageCard>
+                    {mom.llmData && (
+                        <LLMDataEditor
+                            momId={mom.id}
+                            llmData={mom.llmData}
+                            onUpdate={handleLLMDataUpdate}
+                            disabled={user?.accessLevel !== "notary"}
+                        />
+                    )}
                 </PageSection>
             </PageContent>
         </PageContainer>
