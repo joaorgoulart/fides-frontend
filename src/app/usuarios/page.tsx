@@ -481,7 +481,6 @@ export default function UsersManagementPage() {
                                         <TableHead>Login</TableHead>
                                         <TableHead>CNPJ</TableHead>
                                         <TableHead>Nível de Acesso</TableHead>
-                                        <TableHead>Atas Criadas</TableHead>
                                         <TableHead>Criado em</TableHead>
                                         <TableHead className="text-right">
                                             Ações
@@ -505,12 +504,6 @@ export default function UsersManagementPage() {
                                                 {getAccessLevelBadge(
                                                     userItem.accessLevel
                                                 )}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="outline">
-                                                    {userItem.stats
-                                                        ?.createdMoMs || 0}
-                                                </Badge>
                                             </TableCell>
                                             <TableCell className="text-sm text-gray-600">
                                                 {formatDate(userItem.createdAt)}

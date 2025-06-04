@@ -8,7 +8,8 @@ export interface MeetingMinute {
     photoUrl?: string;
     signatureUrl?: string;
     llmData?: LLMData;
-    validationReport?: ValidationReport;
+    signaturesValid?: boolean;
+    inconsistencies?: string[];
     comments?: string[];
     blockchainHash?: string;
     blockchainTxId?: string;
@@ -36,12 +37,6 @@ export interface Participant {
     role: string;
 }
 
-export interface ValidationReport {
-    signaturesValid: boolean;
-    participantsValid: boolean;
-    inconsistencies: string[];
-}
-
 export interface User {
     id: string;
     login: string;
@@ -49,9 +44,6 @@ export interface User {
     accessLevel: "client" | "notary";
     createdAt: string;
     updatedAt: string;
-    stats?: {
-        createdMoMs: number;
-    };
 }
 
 export interface AuthResponse {

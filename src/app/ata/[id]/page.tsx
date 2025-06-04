@@ -234,42 +234,28 @@ export default function MoMDetailPage() {
                 </div>
             </PageCard>
 
-            {/* Validation Report */}
             <PageCard
                 title="Relatório de Validação"
                 headerActions={<Shield className="w-5 h-5 text-gray-500" />}
             >
                 <div className="space-y-4">
                     <div className="flex items-center">
-                        {mom.validationReport?.signaturesValid ? (
+                        {mom.signaturesValid ? (
                             <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
                         ) : (
                             <XCircle className="w-5 h-5 text-red-500 mr-2" />
                         )}
                         <span className="text-sm text-gray-900">
                             Assinaturas{" "}
-                            {mom.validationReport?.signaturesValid
+                            {mom.signaturesValid
                                 ? "Válidas"
                                 : "Inválidas"}
                         </span>
                     </div>
 
-                    <div className="flex items-center">
-                        {mom.validationReport?.participantsValid ? (
-                            <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                        ) : (
-                            <XCircle className="w-5 h-5 text-red-500 mr-2" />
-                        )}
-                        <span className="text-sm text-gray-900">
-                            Participantes{" "}
-                            {mom.validationReport?.participantsValid
-                                ? "Válidos"
-                                : "Inválidos"}
-                        </span>
-                    </div>
 
-                    {mom.validationReport?.inconsistencies &&
-                        mom.validationReport.inconsistencies.length > 0 && (
+                    {mom.inconsistencies &&
+                        mom.inconsistencies.length > 0 && (
                             <div className="mt-4">
                                 <div className="flex items-center text-yellow-600 mb-2">
                                     <AlertTriangle className="w-4 h-4 mr-1" />
@@ -278,7 +264,7 @@ export default function MoMDetailPage() {
                                     </span>
                                 </div>
                                 <ul className="text-sm text-gray-600 space-y-1">
-                                    {mom.validationReport.inconsistencies.map(
+                                    {mom.inconsistencies.map(
                                         (issue, index) => (
                                             <li
                                                 key={index}

@@ -231,7 +231,6 @@ class ApiService {
             accessLevel: response.accessLevel,
             createdAt: response.createdAt,
             updatedAt: response.updatedAt,
-            stats: response.stats,
         };
     }
 

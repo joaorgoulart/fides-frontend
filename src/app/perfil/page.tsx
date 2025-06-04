@@ -206,13 +206,6 @@ export default function PerfilPage() {
                     label="Membro desde"
                     value={user?.createdAt ? formatDate(user.createdAt) : ""}
                 />
-                {user?.stats && (
-                    <InfoField
-                        label="Atas Criadas"
-                        value={user.stats.createdMoMs.toString()}
-                        highlight
-                    />
-                )}
             </div>
         </PageCard>
     );

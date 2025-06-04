@@ -418,7 +418,7 @@ export default function EmpresaPage() {
                         <PageGrid
                             cols={{ sm: 2, lg: 4 }}
                             gap={6}
-                            className="mb-6 sm:mb-8"
+                            className="mb-6 sm:mb-8 gap-4"
                         >
                             <Card className="bg-white">
                                 <CardContent className="p-3 sm:p-6">

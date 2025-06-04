@@ -14,6 +14,7 @@ import {
     Shield,
     ShieldCheck,
     Download,
+    AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -29,13 +30,22 @@ import {
     PageCard,
     PageLoading,
     PageEmpty,
-    PageSection,
 } from "@/components/common/PageComponents";
+import {
+    Table,
+    TableCell,
+    TableBody,
+    TableHead,
+    TableRow,
+    TableHeader,
+} from "@/components/ui/table";
 
 interface MeetingMinute {
     id: string;
     cnpj: string;
     submissionDate: string;
+    signaturesValid?: boolean;
+    inconsistencies?: string[];
     status: string;
     summary: string;
     pdfUrl?: string;
@@ -54,11 +64,6 @@ interface MeetingMinute {
         }>;
         signatures: string[];
         keywords: string[];
-    };
-    validationReport?: {
-        signaturesValid: boolean;
-        participantsValid: boolean;
-        inconsistencies: string[];
     };
     comments?: string[];
 }
@@ -444,6 +449,54 @@ export default function AtaDetalhePage() {
                             </p>
                         </PageCard>
 
+                        <PageCard
+                            title="Relatório de Validação"
+                            headerActions={
+                                <Shield className="w-5 h-5 text-gray-500" />
+                            }
+                        >
+                            <div className="space-y-4">
+                                <div className="flex items-center">
+                                    {meetingMinute.signaturesValid ? (
+                                        <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                                    ) : (
+                                        <XCircle className="w-5 h-5 text-red-500 mr-2" />
+                                    )}
+                                    <span className="text-sm text-gray-900">
+                                        Assinaturas{" "}
+                                        {meetingMinute.signaturesValid
+                                            ? "Válidas"
+                                            : "Inválidas"}
+                                    </span>
+                                </div>
+
+                                {meetingMinute.inconsistencies &&
+                                    meetingMinute.inconsistencies.length >
+                                        0 && (
+                                        <div className="mt-4">
+                                            <div className="flex items-center text-yellow-600 mb-2">
+                                                <AlertTriangle className="w-4 h-4 mr-1" />
+                                                <span className="text-sm font-medium">
+                                                    Inconsistências
+                                                </span>
+                                            </div>
+                                            <ul className="text-sm text-gray-600 space-y-1">
+                                                {meetingMinute.inconsistencies.map(
+                                                    (issue, index) => (
+                                                        <li
+                                                            key={index}
+                                                            className="list-disc list-inside"
+                                                        >
+                                                            {issue}
+                                                        </li>
+                                                    )
+                                                )}
+                                            </ul>
+                                        </div>
+                                    )}
+                            </div>
+                        </PageCard>
+
                         {/* Resumo */}
                         {meetingMinute.llmData?.summary && (
                             <PageCard
@@ -507,37 +560,45 @@ export default function AtaDetalhePage() {
                                     title="Participantes"
                                     className="bg-white"
                                 >
-                                    <div className="space-y-2 sm:space-y-3">
-                                        {meetingMinute.llmData.participants.map(
-                                            (participant, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="p-3 sm:p-4 bg-gray-50 rounded-lg"
-                                                >
-                                                    <p className="font-medium text-gray-900 text-sm sm:text-base mb-1">
-                                                        {participant.name}
-                                                    </p>
-                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                                                        <p className="text-xs sm:text-sm text-gray-600">
-                                                            {participant.role}
-                                                        </p>
-                                                        <span className="hidden sm:inline text-gray-400">
-                                                            •
-                                                        </span>
-                                                        <p className="text-xs sm:text-sm text-gray-600">
-                                                            RG: {participant.rg}
-                                                        </p>
-                                                        <span className="hidden sm:inline text-gray-400">
-                                                            •
-                                                        </span>
-                                                        <p className="text-xs sm:text-sm text-gray-600">
-                                                            CPF:{" "}
-                                                            {participant.cpf}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            )
-                                        )}
+                                    <div className="overflow-x-auto">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Nome</TableHead>
+                                                    <TableHead>RG</TableHead>
+                                                    <TableHead>CPF</TableHead>
+                                                    <TableHead>
+                                                        Função
+                                                    </TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {meetingMinute.llmData.participants.map(
+                                                    (participant, index) => (
+                                                        <TableRow key={index}>
+                                                            <TableCell className="text-sm text-gray-900">
+                                                                {
+                                                                    participant.name
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className="text-sm text-gray-500">
+                                                                {participant.rg}
+                                                            </TableCell>
+                                                            <TableCell className="text-sm text-gray-500">
+                                                                {
+                                                                    participant.cpf
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className="text-sm text-gray-700">
+                                                                {
+                                                                    participant.role
+                                                                }
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )
+                                                )}
+                                            </TableBody>
+                                        </Table>
                                     </div>
                                 </PageCard>
                             )}
