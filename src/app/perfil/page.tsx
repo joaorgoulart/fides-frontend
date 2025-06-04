@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { User as UserIcon, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,76 @@ import {
     PageTitle,
 } from "@/components/common/PageComponents";
 
+// Componentes movidos para fora da função principal
+const InfoField = ({
+    label,
+    value,
+    highlight = false,
+}: {
+    label: string;
+    value?: string;
+    highlight?: boolean;
+}) => (
+    <div>
+        <Label className="text-sm font-medium text-gray-600">{label}</Label>
+        <p
+            className={`text-sm sm:text-base text-gray-900 ${
+                highlight ? "font-medium" : ""
+            }`}
+        >
+            {value}
+        </p>
+    </div>
+);
+
+const PasswordField = ({
+    id,
+    label,
+    value,
+    onChange,
+    show,
+    onToggle,
+    placeholder,
+    helper,
+}: {
+    id: string;
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+    show: boolean;
+    onToggle: () => void;
+    placeholder: string;
+    helper?: string;
+}) => (
+    <div className="space-y-2">
+        <Label htmlFor={id}>{label}</Label>
+        <div className="relative">
+            <Input
+                id={id}
+                type={show ? "text" : "password"}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={placeholder}
+                className="pr-10"
+            />
+            <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3"
+                onClick={onToggle}
+            >
+                {show ? (
+                    <EyeOff className="h-4 w-4" />
+                ) : (
+                    <Eye className="h-4 w-4" />
+                )}
+            </Button>
+        </div>
+        {helper && <p className="text-xs text-gray-500">{helper}</p>}
+    </div>
+);
+
 export default function PerfilPage() {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -33,18 +103,18 @@ export default function PerfilPage() {
     const { user, logout } = useAuth();
     const router = useRouter();
 
-    // Configurações dinâmicas baseadas no tipo de usuário
+    // Configurações dinâmicas baseadas no tipo de usuário - usando useMemo para evitar recriações
     const isClient = user?.accessLevel === "client";
-    const theme = {
+    const theme = useMemo(() => ({
         colors: isClient ? "green" : "blue",
         icon: isClient ? "text-green-600" : "text-blue-600",
         iconBg: isClient ? "bg-green-100" : "bg-blue-100",
         button: isClient
             ? "bg-green-600 hover:bg-green-700"
             : "bg-blue-600 hover:bg-blue-700",
-    };
+    }), [isClient]);
 
-    const validateForm = () => {
+    const validateForm = useCallback(() => {
         if (!currentPassword || !newPassword || !confirmPassword) {
             setError("Todos os campos são obrigatórios");
             return false;
@@ -62,15 +132,15 @@ export default function PerfilPage() {
             return false;
         }
         return true;
-    };
+    }, [currentPassword, newPassword, confirmPassword]);
 
-    const clearForm = () => {
+    const clearForm = useCallback(() => {
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-    };
+    }, []);
 
-    const handleUpdatePassword = async (e: React.FormEvent) => {
+    const handleUpdatePassword = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!validateForm()) return;
@@ -91,9 +161,9 @@ export default function PerfilPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [validateForm, currentPassword, newPassword, clearForm]);
 
-    const formatDate = (dateString: string) => {
+    const formatDate = useCallback((dateString: string) => {
         return new Date(dateString).toLocaleDateString("pt-BR", {
             day: "2-digit",
             month: "2-digit",
@@ -101,92 +171,36 @@ export default function PerfilPage() {
             hour: "2-digit",
             minute: "2-digit",
         });
-    };
+    }, []);
 
-    const handleGoBack = () => {
+    const handleGoBack = useCallback(() => {
         router.push(isClient ? "/empresa" : "/dashboard");
-    };
+    }, [router, isClient]);
 
-    const getPageTitle = () => {
+    const getPageTitle = useCallback(() => {
         return isClient ? "Interface Empresarial" : "Dashboard do Cartorário";
-    };
+    }, [isClient]);
 
-    const headerActions = (
+    // Callbacks para toggle de visibilidade de senha
+    const toggleCurrentPassword = useCallback(() => {
+        setShowCurrentPassword(!showCurrentPassword);
+    }, [showCurrentPassword]);
+
+    const toggleNewPassword = useCallback(() => {
+        setShowNewPassword(!showNewPassword);
+    }, [showNewPassword]);
+
+    const toggleConfirmPassword = useCallback(() => {
+        setShowConfirmPassword(!showConfirmPassword);
+    }, [showConfirmPassword]);
+
+    const headerActions = useMemo(() => (
         <Button variant="outline" onClick={logout} size="sm">
             Sair
         </Button>
-    );
+    ), [logout]);
 
-    const InfoField = ({
-        label,
-        value,
-        highlight = false,
-    }: {
-        label: string;
-        value?: string;
-        highlight?: boolean;
-    }) => (
-        <div>
-            <Label className="text-sm font-medium text-gray-600">{label}</Label>
-            <p
-                className={`text-sm sm:text-base text-gray-900 ${
-                    highlight ? "font-medium" : ""
-                }`}
-            >
-                {value}
-            </p>
-        </div>
-    );
-
-    const PasswordField = ({
-        id,
-        label,
-        value,
-        onChange,
-        show,
-        onToggle,
-        placeholder,
-        helper,
-    }: {
-        id: string;
-        label: string;
-        value: string;
-        onChange: (value: string) => void;
-        show: boolean;
-        onToggle: () => void;
-        placeholder: string;
-        helper?: string;
-    }) => (
-        <div className="space-y-2">
-            <Label htmlFor={id}>{label}</Label>
-            <div className="relative">
-                <Input
-                    id={id}
-                    type={show ? "text" : "password"}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    placeholder={placeholder}
-                    className="pr-10"
-                />
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3"
-                    onClick={onToggle}
-                >
-                    {show ? (
-                        <EyeOff className="h-4 w-4" />
-                    ) : (
-                        <Eye className="h-4 w-4" />
-                    )}
-                </Button>
-            </div>
-            {helper && <p className="text-xs text-gray-500">{helper}</p>}
-        </div>
-    );
-
-    const ProfileInfo = () => (
+    const ProfileInfo = useMemo(() => (
         <PageCard
             title="Informações do Perfil"
             headerActions={
@@ -208,9 +222,9 @@ export default function PerfilPage() {
                 />
             </div>
         </PageCard>
-    );
+    ), [theme.iconBg, theme.icon, user?.login, user?.cnpj, user?.createdAt, isClient, formatDate]);
 
-    const PasswordForm = () => (
+    const PasswordForm = useMemo(() => (
         <PageCard
             title="Alterar Senha"
             headerActions={
@@ -248,9 +262,7 @@ export default function PerfilPage() {
                     value={currentPassword}
                     onChange={setCurrentPassword}
                     show={showCurrentPassword}
-                    onToggle={() =>
-                        setShowCurrentPassword(!showCurrentPassword)
-                    }
+                    onToggle={toggleCurrentPassword}
                     placeholder="Digite sua senha atual"
                 />
 
@@ -260,7 +272,7 @@ export default function PerfilPage() {
                     value={newPassword}
                     onChange={setNewPassword}
                     show={showNewPassword}
-                    onToggle={() => setShowNewPassword(!showNewPassword)}
+                    onToggle={toggleNewPassword}
                     placeholder="Digite sua nova senha"
                     helper="A senha deve ter pelo menos 6 caracteres"
                 />
@@ -271,9 +283,7 @@ export default function PerfilPage() {
                     value={confirmPassword}
                     onChange={setConfirmPassword}
                     show={showConfirmPassword}
-                    onToggle={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                    }
+                    onToggle={toggleConfirmPassword}
                     placeholder="Confirme sua nova senha"
                 />
 
@@ -293,7 +303,25 @@ export default function PerfilPage() {
                 </Button>
             </form>
         </PageCard>
-    );
+    ), [
+        theme.iconBg,
+        theme.icon,
+        theme.colors,
+        theme.button,
+        handleUpdatePassword,
+        error,
+        success,
+        currentPassword,
+        newPassword,
+        confirmPassword,
+        showCurrentPassword,
+        showNewPassword,
+        showConfirmPassword,
+        toggleCurrentPassword,
+        toggleNewPassword,
+        toggleConfirmPassword,
+        isLoading
+    ]);
 
     return (
         <PageContainer
@@ -328,8 +356,8 @@ export default function PerfilPage() {
                 />
 
                 <PageTwoColumns
-                    left={<ProfileInfo />}
-                    right={<PasswordForm />}
+                    left={ProfileInfo}
+                    right={PasswordForm}
                 />
             </PageContent>
         </PageContainer>

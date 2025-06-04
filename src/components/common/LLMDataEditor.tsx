@@ -63,7 +63,7 @@ export default function LLMDataEditor({
             setIsEditing(false);
         } catch (error) {
             console.error("Erro ao salvar dados LLM:", error);
-            alert("Erro ao salvar alterações. Tente novamente.");
+            alert(`Erro ao salvar alterações. Tente novamente. ${error}`);
         } finally {
             setLoading(false);
         }
