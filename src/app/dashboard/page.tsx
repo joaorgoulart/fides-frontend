@@ -38,6 +38,9 @@ import {
     Settings,
     LogOut,
     User,
+    Shield,
+    ShieldCheck,
+    Users,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { apiService } from "@/lib/api";
@@ -48,6 +51,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function DashboardPage() {
     const [meetingMinutes, setMeetingMinutes] = useState<MeetingMinute[]>([]);
@@ -65,10 +69,10 @@ export default function DashboardPage() {
     // Função para aplicar máscara de CNPJ
     const applyCnpjMask = (value: string) => {
         if (!value) return "";
-        
+
         // Remove todos os caracteres não numéricos
         const cleanValue = value.replace(/\D/g, "");
-        
+
         // Aplica a máscara: XX.XXX.XXX/XXXX-XX
         if (cleanValue.length <= 2) {
             return cleanValue;
@@ -157,13 +161,42 @@ export default function DashboardPage() {
         );
     };
 
+    const getBlockchainBadge = (meetingMinute: MeetingMinute) => {
+        if (meetingMinute.blockchainHash) {
+            return (
+                <Badge
+                    variant="default"
+                    className="bg-blue-100 text-blue-800 hover:bg-blue-200"
+                >
+                    <ShieldCheck className="w-3 h-3 mr-1" />
+                    Blockchain
+                </Badge>
+            );
+        }
+        return (
+            <Badge variant="secondary" className="bg-gray-100 text-gray-600">
+                <Shield className="w-3 h-3 mr-1" />
+                Sem Blockchain
+            </Badge>
+        );
+    };
+
     // Ações do header
     const headerActions = (
         <>
             <span className="text-sm text-muted-foreground mr-2">
-                {user?.login} ({accessLevelLabels[user?.accessLevel || "client"]})
+                {user?.login} (
+                {accessLevelLabels[user?.accessLevel || "client"]})
                 {user?.cnpj && ` - ${applyCnpjMask(user.cnpj)}`}
             </span>
+            {user?.accessLevel === "notary" && (
+                <Link href="/usuarios">
+                    <Button variant="outline" size="sm">
+                        <Users className="h-4 w-4 mr-2" />
+                        Gerenciar Usuários
+                    </Button>
+                </Link>
+            )}
             <Link href="/perfil">
                 <Button variant="ghost" size="sm">
                     <User className="h-5 w-5" />
@@ -176,11 +209,19 @@ export default function DashboardPage() {
     );
 
     return (
-        <PageContainer>
+        <PageContainer className="bg-gradient-to-b from-blue-50 to-indigo-100">
             <PageHeader
                 title="Fides - Dashboard do Cartorário"
                 actions={headerActions}
-                icon={<FileText className="h-8 w-8 text-blue-600" />}
+                icon={
+                    <Image
+                        src="/logo.png"
+                        alt="Logo"
+                        width={40}
+                        height={40}
+                        className="sm:w-[40px] sm:h-[40px] flex-shrink-0"
+                    />
+                }
             />
 
             <PageContent>
@@ -310,6 +351,7 @@ export default function DashboardPage() {
                                     <TableHead>CNPJ / ID</TableHead>
                                     <TableHead>Data de Submissão</TableHead>
                                     <TableHead>Status</TableHead>
+                                    <TableHead>Blockchain</TableHead>
                                     <TableHead>Resumo</TableHead>
                                     <TableHead>Ações</TableHead>
                                 </TableRow>
@@ -318,7 +360,7 @@ export default function DashboardPage() {
                                 {loading ? (
                                     <TableRow>
                                         <TableCell
-                                            colSpan={5}
+                                            colSpan={6}
                                             className="text-center py-8"
                                         >
                                             <div className="flex items-center justify-center">
@@ -330,7 +372,7 @@ export default function DashboardPage() {
                                 ) : meetingMinutes.length === 0 ? (
                                     <TableRow>
                                         <TableCell
-                                            colSpan={5}
+                                            colSpan={6}
                                             className="text-center py-8 text-muted-foreground"
                                         >
                                             Nenhuma ata encontrada
@@ -342,7 +384,9 @@ export default function DashboardPage() {
                                             <TableCell>
                                                 <div>
                                                     <div className="font-medium">
-                                                        {applyCnpjMask(meetingMinute.cnpj)}
+                                                        {applyCnpjMask(
+                                                            meetingMinute.cnpj
+                                                        )}
                                                     </div>
                                                     <div className="text-sm text-muted-foreground">
                                                         #{meetingMinute.id}
@@ -357,6 +401,11 @@ export default function DashboardPage() {
                                             <TableCell>
                                                 {getStatusBadge(
                                                     meetingMinute.status
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {getBlockchainBadge(
+                                                    meetingMinute
                                                 )}
                                             </TableCell>
                                             <TableCell>
