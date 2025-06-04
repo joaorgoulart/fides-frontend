@@ -49,6 +49,9 @@ export interface User {
     accessLevel: "client" | "notary";
     createdAt: string;
     updatedAt: string;
+    stats?: {
+        createdMoMs: number;
+    };
 }
 
 export interface AuthResponse {

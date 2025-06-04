@@ -128,7 +128,7 @@ export default function CadastroPage() {
                     <CardHeader className="text-center">
                         <div className="flex justify-center items-center mb-4">
                             <Image
-                                src="/logo.png"
+                                src="/logo2.png"
                                 alt="Logo"
                                 width={200}
                                 height={200}
