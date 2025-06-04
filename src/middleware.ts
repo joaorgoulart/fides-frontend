@@ -63,7 +63,7 @@ export function middleware(request: NextRequest) {
         if (decoded.accessLevel !== 'CLIENT' && decoded.accessLevel !== 'client') {
             return NextResponse.redirect(new URL('/dashboard', request.url));
         }
-    } else if (pathname.startsWith('/dashboard') || pathname.startsWith('/ata') || pathname.startsWith('/perfil')) {
+    } else if (pathname.startsWith('/dashboard') || pathname.startsWith('/ata')) {
         if (decoded.accessLevel !== 'NOTARY' && decoded.accessLevel !== 'notary' && 
             decoded.accessLevel !== 'ADMIN' && decoded.accessLevel !== 'admin') {
             return NextResponse.redirect(new URL('/empresa', request.url));
