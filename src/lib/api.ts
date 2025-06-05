@@ -7,7 +7,7 @@ import {
 } from "@/types";
 
 const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL;
+    process.env.NEXT_PUBLIC_API_URL || "https://fides-fides-api.kz9t7s.easypanel.host";
 
 interface ApiResponse<T = any> {
     success: boolean;
