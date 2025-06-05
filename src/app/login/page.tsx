@@ -25,16 +25,27 @@ export default function LoginPage() {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const [isMounted, setIsMounted] = useState(false);
 
     const router = useRouter();
     const { login, isLoading, isAuthenticated } = useAuth();
 
+    // Garantir que o componente seja montado no cliente
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     // Redirecionar se já estiver autenticado
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isMounted && isAuthenticated) {
             router.push("/dashboard");
         }
-    }, [isAuthenticated, router]);
+    }, [isAuthenticated, router, isMounted]);
+
+    // Não renderizar até que o componente esteja montado no cliente
+    if (!isMounted) {
+        return null;
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
