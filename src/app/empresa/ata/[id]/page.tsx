@@ -106,61 +106,204 @@ export default function AtaDetalhePage() {
 
         const doc = new jsPDF();
 
-        // Configurar fonte
+        // Configurações de margem e largura
+        const leftMargin = 20;
+        const rightMargin = 20;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const maxWidth = pageWidth - leftMargin - rightMargin;
+        const maxHeight = 270; // Altura máxima antes de quebrar página
+        const lineHeight = 7;
+
+        // Cores
+        const primaryColor: [number, number, number] = [0, 0, 0]; // Preto
+        const secondaryColor: [number, number, number] = [240, 240, 240]; // Cinza claro
+        const textColor: [number, number, number] = [60, 60, 60]; // Cinza escuro
+
+        // Função para verificar e quebrar página se necessário
+        const checkPageBreak = (
+            currentY: number,
+            requiredSpace: number = 15
+        ) => {
+            if (currentY + requiredSpace > maxHeight) {
+                doc.addPage();
+                addHeader(); // Adicionar cabeçalho na nova página
+                return 60; // Reset para posição após cabeçalho
+            }
+            return currentY;
+        };
+
+        // Função para adicionar linha separadora
+        const addSeparator = (y: number, color = secondaryColor) => {
+            doc.setDrawColor(...color);
+            doc.setLineWidth(0.5);
+            doc.line(leftMargin, y, pageWidth - rightMargin, y);
+        };
+
+        // Função para criar caixa de título
+        const addTitleBox = (title: string, y: number) => {
+            doc.setFillColor(...primaryColor);
+            doc.rect(leftMargin, y - 8, maxWidth, 15, "F");
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text(title, leftMargin + 5, y);
+            doc.setTextColor(...textColor);
+            return y + 12;
+        };
+
+        // Função para adicionar bullet point melhorado
+        const addBulletPoint = (text: string, yPos: number) => {
+            const textLines = doc.splitTextToSize(text, maxWidth - 20);
+
+            // Desenhar bullet point simples
+            doc.setFillColor(...primaryColor);
+            doc.circle(leftMargin + 8, yPos + 3, 2, "F");
+
+            // Texto do item
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            doc.text(textLines, leftMargin + 18, yPos);
+
+            return yPos + textLines.length * lineHeight + 5;
+        };
+
+        // Função para adicionar cabeçalho
+        const addHeader = () => {
+            // Fundo do cabeçalho
+            doc.setFillColor(...primaryColor);
+            doc.rect(0, 0, pageWidth, 50, "F");
+
+            // Logo do Fides (retângulo branco com texto)
+            doc.setFillColor(255, 255, 255);
+            doc.rect(20, 15, 35, 20, "F");
+            doc.setTextColor(...primaryColor);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text("FIDES", 37.5 - doc.getTextWidth("FIDES") / 2, 28);
+
+            // Título do documento
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.text("RESUMO DA ATA DE REUNIÃO", 75, 20);
+
+            // Subtítulo
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            doc.text("Sistema de Autenticação Empresarial", 75, 35);
+
+            // Reset cor do texto
+            doc.setTextColor(...textColor);
+        };
+
+        // Adicionar cabeçalho inicial
+        addHeader();
+
+        let yPosition = 70;
+
+        // Caixa de informações básicas
+        doc.setFillColor(...secondaryColor);
+        doc.rect(leftMargin, yPosition - 5, maxWidth, 45, "F");
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text("INFORMAÇÕES GERAIS", leftMargin + 5, yPosition + 5);
+
         doc.setFont("helvetica", "normal");
-
-        // Título
-        doc.setFontSize(20);
-        doc.text("Resumo da Ata de Reunião", 20, 30);
-
-        // Informações básicas
-        doc.setFontSize(12);
-        doc.text(`ID: ${meetingMinute.id}`, 20, 50);
+        doc.setFontSize(10);
+        doc.text(
+            `ID da Ata: ${meetingMinute.id}`,
+            leftMargin + 5,
+            yPosition + 15
+        );
         doc.text(
             `Data de Submissão: ${formatDate(meetingMinute.submissionDate)}`,
-            20,
-            60
+            leftMargin + 5,
+            yPosition + 23
         );
-        doc.text(`Status: ${getStatusText(meetingMinute.status)}`, 20, 70);
+        doc.text(
+            `Status: ${getStatusText(meetingMinute.status)}`,
+            leftMargin + 5,
+            yPosition + 31
+        );
 
         // Status Blockchain
         const blockchainStatus = meetingMinute.blockchainHash
-            ? "Registrado na Blockchain"
-            : "Não registrado na Blockchain";
-        doc.text(`Blockchain: ${blockchainStatus}`, 20, 80);
+            ? "REGISTRADO NA BLOCKCHAIN"
+            : "NÃO REGISTRADO NA BLOCKCHAIN";
+        doc.setTextColor(
+            meetingMinute.blockchainHash ? 0 : 200,
+            meetingMinute.blockchainHash ? 150 : 0,
+            0
+        );
+        doc.text(blockchainStatus, leftMargin + 5, yPosition + 39);
+        doc.setTextColor(...textColor);
 
+        yPosition += 55;
+
+        // Hash da Blockchain (se existir)
         if (meetingMinute.blockchainHash) {
-            doc.text(`Hash: ${meetingMinute.blockchainHash}`, 20, 90);
+            yPosition = checkPageBreak(yPosition, 20);
+            doc.setFillColor(245, 245, 255);
+            doc.rect(leftMargin, yPosition, maxWidth, 15, "F");
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            const hashText = `Hash Blockchain: ${meetingMinute.blockchainHash}`;
+            const hashLines = doc.splitTextToSize(hashText, maxWidth - 10);
+            doc.text(hashLines, leftMargin + 5, yPosition + 8);
+            yPosition += 20;
         }
 
-        let yPosition = meetingMinute.blockchainHash ? 110 : 100;
-
         // Resumo
-        doc.setFontSize(14);
-        doc.text("Resumo:", 20, yPosition);
-        yPosition += 10;
+        yPosition = checkPageBreak(yPosition, 30);
+        yPosition = addTitleBox("RESUMO DA REUNIÃO", yPosition);
+        yPosition += 5;
 
-        doc.setFontSize(12);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
         const summaryLines = doc.splitTextToSize(
             meetingMinute.llmData.summary,
-            170
+            maxWidth - 10
         );
-        doc.text(summaryLines, 20, yPosition);
-        yPosition += summaryLines.length * 7 + 15;
+        yPosition = checkPageBreak(yPosition, summaryLines.length * lineHeight);
+        doc.text(summaryLines, leftMargin + 5, yPosition);
+        yPosition += summaryLines.length * lineHeight + 15;
 
         // Agenda
         if (meetingMinute.llmData.agenda) {
-            doc.setFontSize(14);
-            doc.text("Agenda:", 20, yPosition);
-            yPosition += 10;
+            yPosition = checkPageBreak(yPosition, 30);
+            yPosition = addTitleBox("AGENDA", yPosition);
+            yPosition += 5;
 
-            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
             const agendaLines = doc.splitTextToSize(
                 meetingMinute.llmData.agenda,
-                170
+                maxWidth - 10
             );
-            doc.text(agendaLines, 20, yPosition);
-            yPosition += agendaLines.length * 7 + 15;
+            yPosition = checkPageBreak(
+                yPosition,
+                agendaLines.length * lineHeight
+            );
+            doc.text(agendaLines, leftMargin + 5, yPosition);
+            yPosition += agendaLines.length * lineHeight + 15;
+        }
+
+        // Assuntos Tratados
+        if (
+            meetingMinute.llmData.subjects &&
+            meetingMinute.llmData.subjects.length > 0
+        ) {
+            yPosition = checkPageBreak(yPosition, 30);
+            yPosition = addTitleBox("ASSUNTOS TRATADOS", yPosition);
+            yPosition += 5;
+
+            meetingMinute.llmData.subjects.forEach((subject, index) => {
+                yPosition = checkPageBreak(yPosition, 25);
+                yPosition = addBulletPoint(subject, yPosition);
+            });
+            yPosition += 10;
         }
 
         // Deliberações
@@ -168,20 +311,14 @@ export default function AtaDetalhePage() {
             meetingMinute.llmData.deliberations &&
             meetingMinute.llmData.deliberations.length > 0
         ) {
-            doc.setFontSize(14);
-            doc.text("Deliberações:", 20, yPosition);
-            yPosition += 10;
+            yPosition = checkPageBreak(yPosition, 30);
+            yPosition = addTitleBox("DELIBERAÇÕES", yPosition);
+            yPosition += 5;
 
-            doc.setFontSize(12);
             meetingMinute.llmData.deliberations.forEach(
                 (deliberation, index) => {
-                    if (yPosition > 270) {
-                        doc.addPage();
-                        yPosition = 20;
-                    }
-
-                    doc.text(`${index + 1}. ${deliberation}`, 20, yPosition);
-                    yPosition += 10;
+                    yPosition = checkPageBreak(yPosition, 25);
+                    yPosition = addBulletPoint(deliberation, yPosition);
                 }
             );
             yPosition += 10;
@@ -192,36 +329,87 @@ export default function AtaDetalhePage() {
             meetingMinute.llmData.participants &&
             meetingMinute.llmData.participants.length > 0
         ) {
-            if (yPosition > 250) {
-                doc.addPage();
-                yPosition = 20;
-            }
+            yPosition = checkPageBreak(yPosition, 30);
+            yPosition = addTitleBox("PARTICIPANTES", yPosition);
+            yPosition += 5;
 
-            doc.setFontSize(14);
-            doc.text("Participantes:", 20, yPosition);
-            yPosition += 10;
+            // Cabeçalho da tabela
+            doc.setFillColor(...secondaryColor);
+            doc.rect(leftMargin, yPosition, maxWidth, 12, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("Nome", leftMargin + 5, yPosition + 7);
+            doc.text("Função", leftMargin + 80, yPosition + 7);
+            doc.text("Documentos", leftMargin + 130, yPosition + 7);
 
-            doc.setFontSize(12);
+            yPosition += 15;
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
             meetingMinute.llmData.participants.forEach((participant, index) => {
-                if (yPosition > 270) {
-                    doc.addPage();
-                    yPosition = 20;
+                yPosition = checkPageBreak(yPosition, 20);
+
+                // Linha alternada
+                if (index % 2 === 0) {
+                    doc.setFillColor(250, 250, 250);
+                    doc.rect(leftMargin, yPosition - 3, maxWidth, 15, "F");
                 }
 
-                doc.text(
-                    `${index + 1}. ${participant.name} - ${participant.role}`,
-                    20,
-                    yPosition
+                const nameLines = doc.splitTextToSize(participant.name, 70);
+                const roleLines = doc.splitTextToSize(participant.role, 45);
+                const docs = [];
+                if (participant.cpf) docs.push(`CPF: ${participant.cpf}`);
+                if (participant.rg) docs.push(`RG: ${participant.rg}`);
+                const docLines = doc.splitTextToSize(docs.join(", "), 60);
+
+                doc.text(nameLines, leftMargin + 5, yPosition + 3);
+                doc.text(roleLines, leftMargin + 80, yPosition + 3);
+                doc.text(docLines, leftMargin + 130, yPosition + 3);
+
+                yPosition +=
+                    Math.max(
+                        nameLines.length,
+                        roleLines.length,
+                        docLines.length
+                    ) *
+                        6 +
+                    8;
+            });
+            yPosition += 10;
+        }
+
+        // Comentários do Cartório
+        if (meetingMinute.comments && meetingMinute.comments.length > 0) {
+            yPosition = checkPageBreak(yPosition, 30);
+            yPosition = addTitleBox("COMENTÁRIOS DO CARTÓRIO", yPosition);
+            yPosition += 5;
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            meetingMinute.comments.forEach((comment, index) => {
+                yPosition = checkPageBreak(yPosition, 20);
+
+                // Caixa de comentário
+                doc.setFillColor(255, 250, 235);
+                const commentLines = doc.splitTextToSize(
+                    `${index + 1}. ${comment}`,
+                    maxWidth - 15
                 );
-                if (participant.cpf) {
-                    yPosition += 7;
-                    doc.text(`   CPF: ${participant.cpf}`, 20, yPosition);
-                }
-                if (participant.rg) {
-                    yPosition += 7;
-                    doc.text(`   RG: ${participant.rg}`, 20, yPosition);
-                }
-                yPosition += 10;
+                const boxHeight = commentLines.length * lineHeight + 8;
+                doc.rect(
+                    leftMargin + 5,
+                    yPosition - 3,
+                    maxWidth - 10,
+                    boxHeight,
+                    "F"
+                );
+
+                // Borda esquerda colorida
+                doc.setFillColor(255, 193, 7);
+                doc.rect(leftMargin + 5, yPosition - 3, 3, boxHeight, "F");
+
+                doc.text(commentLines, leftMargin + 15, yPosition + 3);
+                yPosition += boxHeight + 5;
             });
             yPosition += 10;
         }
@@ -231,28 +419,66 @@ export default function AtaDetalhePage() {
             meetingMinute.llmData.keywords &&
             meetingMinute.llmData.keywords.length > 0
         ) {
-            if (yPosition > 250) {
-                doc.addPage();
-                yPosition = 20;
-            }
+            yPosition = checkPageBreak(yPosition, 30);
+            yPosition = addTitleBox("PALAVRAS-CHAVE", yPosition);
+            yPosition += 8;
 
-            doc.setFontSize(14);
-            doc.text("Palavras-chave:", 20, yPosition);
-            yPosition += 10;
+            // Tags de palavras-chave
+            let xPosition = leftMargin + 5;
+            const tagHeight = 12;
 
-            doc.setFontSize(12);
-            const keywordsText = meetingMinute.llmData.keywords.join(", ");
-            const keywordsLines = doc.splitTextToSize(keywordsText, 170);
-            doc.text(keywordsLines, 20, yPosition);
+            meetingMinute.llmData.keywords.forEach((keyword, index) => {
+                const keywordWidth = doc.getTextWidth(keyword) + 10;
+
+                if (xPosition + keywordWidth > pageWidth - rightMargin) {
+                    xPosition = leftMargin + 5;
+                    yPosition += tagHeight + 5;
+                    yPosition = checkPageBreak(yPosition, tagHeight + 5);
+                }
+
+                // Tag background
+                doc.setFillColor(230, 255, 230);
+                doc.rect(
+                    xPosition,
+                    yPosition - 8,
+                    keywordWidth,
+                    tagHeight,
+                    "F"
+                );
+
+                // Tag border
+                doc.setDrawColor(...primaryColor);
+                doc.setLineWidth(0.5);
+                doc.rect(xPosition, yPosition - 8, keywordWidth, tagHeight);
+
+                // Tag text
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.text(keyword, xPosition + 5, yPosition - 1);
+
+                xPosition += keywordWidth + 8;
+            });
         }
 
-        // Rodapé
+        // Rodapé aprimorado
         const pageCount = doc.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
-            doc.setFontSize(10);
-            doc.text(`Página ${i} de ${pageCount}`, 20, 290);
-            doc.text("Gerado pelo Sistema Fides", 140, 290);
+
+            // Linha do rodapé
+            addSeparator(285, [200, 200, 200]);
+
+            // Texto do rodapé
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(120, 120, 120);
+            doc.text(`Página ${i} de ${pageCount}`, leftMargin, 292);
+            doc.text("Gerado pelo Sistema Fides", pageWidth - 65, 292);
+            doc.text(
+                new Date().toLocaleDateString("pt-BR"),
+                pageWidth / 2 - 20,
+                292
+            );
         }
 
         // Salvar o PDF
@@ -621,6 +847,27 @@ export default function AtaDetalhePage() {
                                                         {comment}
                                                     </p>
                                                 </div>
+                                            )
+                                        )}
+                                    </div>
+                                </PageCard>
+                            )}
+
+                        {meetingMinute.llmData?.keywords &&
+                            meetingMinute.llmData.keywords.length > 0 && (
+                                <PageCard
+                                    title="Palavras-chave"
+                                    className="bg-white"
+                                >
+                                    <div className="flex flex-wrap gap-2">
+                                        {meetingMinute.llmData.keywords.map(
+                                            (keyword, index) => (
+                                                <Badge
+                                                    key={index}
+                                                    variant="secondary"
+                                                >
+                                                    {keyword}
+                                                </Badge>
                                             )
                                         )}
                                     </div>
