@@ -1,11 +1,6 @@
 "use client";
 
-import {
-    CheckCircle,
-    XCircle,
-    AlertTriangle,
-    Shield,
-} from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, Shield } from "lucide-react";
 import {
     PageContainer,
     PageHeader,
@@ -189,12 +184,43 @@ export default function MoMDetailPage() {
 
     // PDF Viewer Component
     const pdfViewer = (
-        <PageCard
-            title="Documento PDF"
-            description="Visualização do documento original submetido"
-        >
-            <PdfViewer fileUrl={mom.pdfUrl} height="600px" />
-        </PageCard>
+        <div className="flex flex-col gap-4">
+            <PageCard
+                title="Documento PDF"
+                description="Visualização do documento original submetido"
+            >
+                <PdfViewer fileUrl={mom.pdfUrl} height="600px" />
+            </PageCard>
+            <PageCard
+                title="Identificação da Submissão"
+                description="Visualização da foto e assinatura do documento original submetido"
+            >
+                <div className="flex flex-row gap-2 justify-center">
+                    <div className="flex flex-col gap-2">
+                        <Badge variant="outline" className="w-fit">
+                            Foto
+                        </Badge>
+                        <Image
+                            src={mom.photoUrl as string}
+                            alt="Fotos"
+                            width={300}
+                            height={300}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Badge variant="outline" className="w-fit">
+                            Assinatura
+                        </Badge>
+                        <Image
+                            src={mom.signatureUrl as string}
+                            alt="Assinatura"
+                            width={300}
+                            height={300}
+                        />
+                    </div>
+                </div>
+            </PageCard>
+        </div>
     );
 
     // Right Panel Components
@@ -226,14 +252,13 @@ export default function MoMDetailPage() {
                             <Label className="text-sm font-medium">
                                 Hash Blockchain
                             </Label>
-                            <p className="text-xs text-muted-foreground font-mono break-all mt-1">
+                            <p className="text-xs text-wrap text-muted-foreground font-mono break-all mt-1">
                                 {mom.blockchainHash}
                             </p>
                         </div>
                     )}
                 </div>
             </PageCard>
-
             <PageCard
                 title="Relatório de Validação"
                 headerActions={<Shield className="w-5 h-5 text-gray-500" />}
@@ -247,36 +272,30 @@ export default function MoMDetailPage() {
                         )}
                         <span className="text-sm text-gray-900">
                             Assinaturas{" "}
-                            {mom.signaturesValid
-                                ? "Válidas"
-                                : "Inválidas"}
+                            {mom.signaturesValid ? "Válidas" : "Inválidas"}
                         </span>
                     </div>
 
-
-                    {mom.inconsistencies &&
-                        mom.inconsistencies.length > 0 && (
-                            <div className="mt-4">
-                                <div className="flex items-center text-yellow-600 mb-2">
-                                    <AlertTriangle className="w-4 h-4 mr-1" />
-                                    <span className="text-sm font-medium">
-                                        Inconsistências
-                                    </span>
-                                </div>
-                                <ul className="text-sm text-gray-600 space-y-1">
-                                    {mom.inconsistencies.map(
-                                        (issue, index) => (
-                                            <li
-                                                key={index}
-                                                className="list-disc list-inside"
-                                            >
-                                                {issue}
-                                            </li>
-                                        )
-                                    )}
-                                </ul>
+                    {mom.inconsistencies && mom.inconsistencies.length > 0 && (
+                        <div className="mt-4">
+                            <div className="flex items-center text-yellow-600 mb-2">
+                                <AlertTriangle className="w-4 h-4 mr-1" />
+                                <span className="text-sm font-medium">
+                                    Inconsistências
+                                </span>
                             </div>
-                        )}
+                            <ul className="text-sm text-gray-600 space-y-1">
+                                {mom.inconsistencies.map((issue, index) => (
+                                    <li
+                                        key={index}
+                                        className="list-disc list-inside"
+                                    >
+                                        {issue}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             </PageCard>
 
@@ -315,13 +334,13 @@ export default function MoMDetailPage() {
                     )}
 
                     {mom.status === "authenticated" && (
-                        <div className="text-center py-4">
+                        <div className="text-center py-4 text-wrap">
                             <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
                             <p className="text-sm text-muted-foreground">
                                 Ata Autenticada
                             </p>
                             {mom.blockchainTxId && (
-                                <p className="text-xs text-muted-foreground mt-1">
+                                <p className="text-xs break-all text-muted-foreground mt-1">
                                     TX: {mom.blockchainTxId}
                                 </p>
                             )}
@@ -366,13 +385,15 @@ export default function MoMDetailPage() {
                 showBackButton
                 onBack={() => router.back()}
                 actions={getStatusBadge(mom.status)}
-                icon={<Image
-                    src="/logo.png"
-                    alt="Logo"
-                    width={40}
-                    height={40}
-                    className="sm:w-[40px] sm:h-[40px] flex-shrink-0"
-                />}
+                icon={
+                    <Image
+                        src="/logo.png"
+                        alt="Logo"
+                        width={40}
+                        height={40}
+                        className="sm:w-[40px] sm:h-[40px] flex-shrink-0"
+                    />
+                }
             />
 
             <PageContent>
